@@ -14,7 +14,7 @@ class Objeto:
         self.vertex_buffer = None
         self.texture_buffer = None
         self.normal_buffer = None
-        self.indice_inicial = 0
+        # self.indice_inicial = 0
 
     def carrega_textura(self, endereco_textura):
         # Carregar textura e enviar para a GPU
@@ -53,7 +53,7 @@ class Objeto:
                 elif values[0] == "vn":  # Normais
                     normals_list.append(list(map(float, values[1:4])))
                 elif values[0] == "f":  # Faces
-                    print(f"Face encontrada: {values[1:]}")
+                    # print(f"Face encontrada: {values[1:]}")
                     face_vertices = []
                     face_textures = []
                     face_normals = []

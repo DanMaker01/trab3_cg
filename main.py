@@ -683,7 +683,7 @@ while not glfw.window_should_close(window):
         ang += 0.01
 
 
-    desenha_luz(math.cos(ang)*0.5, math.sin(ang)*0.5, 3.0)   
+    desenha_luz(math.cos(ang), math.sin(ang), 3.0)   
 
 
     
