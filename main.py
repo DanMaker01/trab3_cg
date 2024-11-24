@@ -405,7 +405,8 @@ def desenha_luz(t_x, t_y, t_z):
     s_z = 1
 
     # Cria a matriz model usando a nova função
-    mat_model = model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    # mat_model = model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    mat_model = np.array(glm.mat4(1.0)).T
 
     # Envia a matriz model para a GPU
     loc_model = glGetUniformLocation(program, "model")
@@ -433,14 +434,14 @@ def desenha_luz(t_x, t_y, t_z):
         glUniform1f(loc_ns, ns)
 
     # Envia a posição da luz para a GPU
-    loc_light_pos = glGetUniformLocation(program, "lightPos")
-    glUniform3f(loc_light_pos, t_x, t_y, t_z)
+    loc_light_pos = glGetUniformLocation(program, "lightPos") # recuperando localizacao da variavel lightPos na GPU
+    glUniform3f(loc_light_pos, t_x, t_y, t_z)                 # enviando a posicao da luz 
 
     # Define a textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 0)
+    glBindTexture(GL_TEXTURE_2D, 1)
 
     # Desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 36, 36)
+    glDrawArrays(GL_TRIANGLES, 0, 36)
 
 
 
@@ -589,6 +590,14 @@ def model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z):
     matrix_transform = matrix_transform @ rotacao_y(angle_y)
     matrix_transform = matrix_transform @ rotacao_z(angle_z)
     
+    # Aplicando escala
+    scaling = np.array([
+        [s_x, 0, 0, 0],
+        [0, s_y, 0, 0],
+        [0, 0, s_z, 0],
+        [0, 0, 0, 1]
+    ])
+    
     # Aplicando translação
     translation = np.array([
         [1, 0, 0, t_x],
@@ -597,14 +606,6 @@ def model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z):
         [0, 0, 0, 1]
     ])
     matrix_transform = matrix_transform @ translation
-    
-    # Aplicando escala
-    scaling = np.array([
-        [s_x, 0, 0, 0],
-        [0, s_y, 0, 0],
-        [0, 0, s_z, 0],
-        [0, 0, 0, 1]
-    ])
     matrix_transform = matrix_transform @ scaling
     
     return matrix_transform
