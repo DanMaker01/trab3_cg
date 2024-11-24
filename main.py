@@ -724,13 +724,16 @@ while not glfw.window_should_close(window):
         glDisable(GL_CULL_FACE) 
     
 
-    desenha_caixa()   
+    # desenha_caixa()   
 
-    desenha_baleia()
+    # desenha_baleia()
 
-    obj.desenha(program, model(0, 0, 0, 0, 2, 0, 0, 1, 1, 1))
+    obj.desenha(program, model(0, 0, 0, 0, 0, 0, 0, 1, 1, 1))
 
-    if especular: ang += 0.01
+    if especular: 
+        ang += 0.01
+
+
     desenha_luz(math.cos(ang)*0.5, math.sin(ang)*0.5, 3.0)   
 
 
