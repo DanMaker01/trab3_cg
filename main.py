@@ -13,8 +13,8 @@ from objeto import Objeto
 
 glfw.init()
 glfw.window_hint(glfw.VISIBLE, glfw.FALSE);
-altura = 800
-largura = 800
+largura = 1920
+altura = 1080
 window = glfw.create_window(largura, altura, "Iluminação", None, None)
 glfw.make_context_current(window)
 
@@ -265,7 +265,7 @@ textures_coord_list = []
 
 # ---------------------------------------------------------------------------
 
-modelo = load_model_from_file('caixa.obj')
+modelo = load_model_from_file('caixa\\caixa.obj')
 
 ### inserindo vertices do modelo no vetor de vertices
 print('Processando modelo cube.obj. Vertice inicial:',len(vertices_list))
@@ -282,12 +282,12 @@ print('Processando modelo cube.obj. Vertice final:',len(vertices_list))
 
 
 ### carregando textura equivalente e definindo um id (buffer): use um id por textura!
-load_texture_from_file(0,'caixa_madeira.jpg')
+load_texture_from_file(0,'caixa\\caixa.jpg')
 
 
 # -------------------------
 
-modelo = load_model_from_file('luz.obj')
+modelo = load_model_from_file('luz\\luz.obj')
 
 ### inserindo vertices do modelo no vetor de vertices
 print('Processando modelo luz.obj. Vertice inicial:',len(vertices_list))
@@ -304,14 +304,14 @@ print('Processando modelo luz.obj. Vertice final:',len(vertices_list))
 
 
 ### carregando textura equivalente e definindo um id (buffer): use um id por textura!
-load_texture_from_file(1,'luz.png')
+load_texture_from_file(1,'luz\\luz.png')
 
 # ----------------------------------------------------
 
-modelo = load_model_from_file('baleia.obj')
+modelo = load_model_from_file('baleia\\baleia.obj')
 
 ### inserindo vertices do modelo no vetor de vertices
-print('Processando modelo luz.obj. Vertice inicial:',len(vertices_list))
+print('Processando modelo baleia.obj. Vertice inicial:',len(vertices_list))
 for face in modelo['faces']:
     for vertice_id in face[0]:
         vertices_list.append( modelo['vertices'][vertice_id-1] )
@@ -319,13 +319,13 @@ for face in modelo['faces']:
         textures_coord_list.append( modelo['texture'][texture_id-1] )
     for normal_id in face[2]:
         normals_list.append( modelo['normals'][normal_id-1] )
-print('Processando modelo luz.obj. Vertice final:',len(vertices_list))
+print('Processando modelo baleia.obj. Vertice final:',len(vertices_list))
 
 ### inserindo coordenadas de textura do modelo no vetor de texturas
 
 
 ### carregando textura equivalente e definindo um id (buffer): use um id por textura!
-load_texture_from_file(2,'luz.png')
+load_texture_from_file(2,'baleia\\baleia.jpg')
 
 # ----------------------------------------------------------------------------
 
@@ -392,156 +392,59 @@ ka = 0.1 # coeficiente de reflexao ambiente do modelo
 kd = 0.5 # coeficiente de reflexao difusa do modelo
 ks = 0.9 # coeficiente de reflexao especular do modelo
 
-def desenha_caixa():
-    global ka, kd, ks
-
-    # aplica a matriz model
-    angle = 0.0
-    
-    r_x = 0.0; r_y = 1.0; r_z = 0.0;
-    
-    # translacao
-    t_x = 0.0; t_y = 0.0; t_z = 0.0;
-    
-    # escala
-    s_x = 1.0; s_y = 1.0; s_z = 1.0;
-    
-    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
-    loc_model = glGetUniformLocation(program, "model")
-    glUniformMatrix4fv(loc_model, 1, GL_FALSE, mat_model)
-       
-
-    loc_ka = glGetUniformLocation(program, "ka") # recuperando localizacao da variavel ka na GPU
-    glUniform1f(loc_ka, ka) ### envia ka pra gpu
-    
-    loc_kd = glGetUniformLocation(program, "kd") # recuperando localizacao da variavel kd na GPU
-    glUniform1f(loc_kd, kd) ### envia kd pra gpu    
-    
-
-    if especular:
-        ns = ns_inc # expoente de reflexao especular
-        
-        loc_ks = glGetUniformLocation(program, "ks") # recuperando localizacao da variavel ks na GPU
-        glUniform1f(loc_ks, ks) ### envia ks pra gpu        
-    
-        loc_ns = glGetUniformLocation(program, "ns") # recuperando localizacao da variavel ns na GPU
-        glUniform1f(loc_ns, ns) ### envia ns pra gpu        
-
-    
-    #define id da textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 0)
-    
-    
-    # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 0, 36) ## renderizando
-    pass
-    
-
-    
     
 def desenha_luz(t_x, t_y, t_z):
-    
+    # Ângulos de rotação (ajustáveis conforme necessário)
+    angle_x = 0.0
+    angle_y = 0.0
+    angle_z = 0.0
 
-    # aplica a matriz model
-    angle = 0.0
-    
-    r_x = 0.0; r_y = 0.0; r_z = 1.0;
-    
-    # translacao
-    #t_x = 0.0; t_y = 0.0; t_z = 0.0;
-    
-    # escala
-    s_x = 0.1; s_y = 0.1; s_z = 0.1;
-    
-    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
+    # Escala
+    s_x = 1
+    s_y = 1
+    s_z = 1
+
+    # Cria a matriz model usando a nova função
+    mat_model = model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z)
+
+    # Envia a matriz model para a GPU
     loc_model = glGetUniformLocation(program, "model")
-    glUniformMatrix4fv(loc_model, 1, GL_FALSE, mat_model)
-       
-    
-    #### define parametros de ilumincao do modelo
-    ka = 1 # coeficiente de reflexao ambiente do modelo
-    kd = 1 # coeficiente de reflexao difusa do modelo
-    
-    
-    loc_ka = glGetUniformLocation(program, "ka") # recuperando localizacao da variavel ka na GPU
-    glUniform1f(loc_ka, ka) ### envia ka pra gpu
-    
-    loc_kd = glGetUniformLocation(program, "kd") # recuperando localizacao da variavel kd na GPU
-    glUniform1f(loc_kd, kd) ### envia kd pra gpu    
+    glUniformMatrix4fv(loc_model, 1, GL_FALSE, mat_model)   
 
+    # Define os parâmetros de iluminação do modelo
+    ka = 1  # Coeficiente de reflexão ambiente
+    kd = 1  # Coeficiente de reflexão difusa
+
+    # Envia ka e kd para a GPU
+    loc_ka = glGetUniformLocation(program, "ka")
+    glUniform1f(loc_ka, ka)
+
+    loc_kd = glGetUniformLocation(program, "kd")
+    glUniform1f(loc_kd, kd)
 
     if especular:
-        
-        ks = 1 # coeficiente de reflexao especular do modelo
-        ns = 1000.0 # expoente de reflexao especular
-        
-        loc_ks = glGetUniformLocation(program, "ks") # recuperando localizacao da variavel ks na GPU
-        glUniform1f(loc_ks, ks) ### envia ns pra gpu        
-        
-        loc_ns = glGetUniformLocation(program, "ns") # recuperando localizacao da variavel ns na GPU
-        glUniform1f(loc_ns, ns) ### envia ns pra gpu            
-    
-    loc_light_pos = glGetUniformLocation(program, "lightPos") # recuperando localizacao da variavel lightPos na GPU
-    glUniform3f(loc_light_pos, t_x, t_y, t_z) ### posicao da fonte de luz
-        
-    
-    #define id da textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 1)
-    
-    
-    # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 36, 36) ## renderizando
-    
-    pass
-    
+        ks = 1      # Coeficiente de reflexão especular
+        ns = 1000.0 # Expoente de reflexão especular
+
+        loc_ks = glGetUniformLocation(program, "ks")
+        glUniform1f(loc_ks, ks)
+
+        loc_ns = glGetUniformLocation(program, "ns")
+        glUniform1f(loc_ns, ns)
+
+    # Envia a posição da luz para a GPU
+    loc_light_pos = glGetUniformLocation(program, "lightPos")
+    glUniform3f(loc_light_pos, t_x, t_y, t_z)
+
+    # Define a textura do modelo
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    # Desenha o modelo
+    glDrawArrays(GL_TRIANGLES, 36, 36)
 
 
 
 
-# -------------------------------------------------------------------
-def desenha_baleia():
-    global ka, kd, ks
-
-    # aplica a matriz model
-    angle = 0.0
-    
-    r_x = 0.0; r_y = 1.0; r_z = 0.0;
-    
-    # translacao
-    t_x = 0.0; t_y = 0.0; t_z = 0.0;
-    
-    # escala
-    s_x = 1.0; s_y = 1.0; s_z = 1.0;
-    
-    mat_model = model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z)
-    loc_model = glGetUniformLocation(program, "model")
-    glUniformMatrix4fv(loc_model, 1, GL_FALSE, mat_model)
-       
-
-    loc_ka = glGetUniformLocation(program, "ka") # recuperando localizacao da variavel ka na GPU
-    glUniform1f(loc_ka, ka) ### envia ka pra gpu
-    
-    loc_kd = glGetUniformLocation(program, "kd") # recuperando localizacao da variavel kd na GPU
-    glUniform1f(loc_kd, kd) ### envia kd pra gpu    
-    
-
-    if especular:
-        ns = ns_inc # expoente de reflexao especular
-        
-        loc_ks = glGetUniformLocation(program, "ks") # recuperando localizacao da variavel ks na GPU
-        glUniform1f(loc_ks, ks) ### envia ks pra gpu        
-    
-        loc_ns = glGetUniformLocation(program, "ns") # recuperando localizacao da variavel ns na GPU
-        glUniform1f(loc_ns, ns) ### envia ns pra gpu        
-
-    
-    #define id da textura do modelo
-    glBindTexture(GL_TEXTURE_2D, 2)
-    
-    
-    # desenha o modelo
-    glDrawArrays(GL_TRIANGLES, 72, 99999) ## renderizando
-    pass
 
 
 
@@ -649,25 +552,63 @@ glfw.set_cursor_pos_callback(window, mouse_event)
 
 # -----------------------------------------------------------------------------------------
 
-def model(angle, r_x, r_y, r_z, t_x, t_y, t_z, s_x, s_y, s_z):
+def model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z):
+    # Funções de rotação para cada eixo
+    def rotacao_x(angle):
+        rad = math.radians(angle)
+        return np.array([
+            [1, 0, 0, 0],
+            [0, math.cos(rad), -math.sin(rad), 0],
+            [0, math.sin(rad), math.cos(rad), 0],
+            [0, 0, 0, 1]
+        ])
     
-    angle = math.radians(angle)
+    def rotacao_y(angle):
+        rad = math.radians(angle)
+        return np.array([
+            [math.cos(rad), 0, math.sin(rad), 0],
+            [0, 1, 0, 0],
+            [-math.sin(rad), 0, math.cos(rad), 0],
+            [0, 0, 0, 1]
+        ])
     
-    matrix_transform = glm.mat4(1.0) # instanciando uma matriz identidade
-       
-    # aplicando rotacao
-    matrix_transform = glm.rotate(matrix_transform, angle, glm.vec3(r_x, r_y, r_z))
-        
-  
-    # aplicando translacao
-    matrix_transform = glm.translate(matrix_transform, glm.vec3(t_x, t_y, t_z))    
+    def rotacao_z(angle):
+        rad = math.radians(angle)
+        return np.array([
+            [math.cos(rad), -math.sin(rad), 0, 0],
+            [math.sin(rad), math.cos(rad), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ])
     
-    # aplicando escala
-    matrix_transform = glm.scale(matrix_transform, glm.vec3(s_x, s_y, s_z))
+    # Matriz identidade inicial
+    matrix_transform = np.identity(4)
     
-    matrix_transform = np.array(matrix_transform).T # pegando a transposta da matriz (glm trabalha com ela invertida)
+    # Aplicando rotações em ordem X, Y, Z
+    matrix_transform = matrix_transform @ rotacao_x(angle_x)
+    matrix_transform = matrix_transform @ rotacao_y(angle_y)
+    matrix_transform = matrix_transform @ rotacao_z(angle_z)
+    
+    # Aplicando translação
+    translation = np.array([
+        [1, 0, 0, t_x],
+        [0, 1, 0, t_y],
+        [0, 0, 1, t_z],
+        [0, 0, 0, 1]
+    ])
+    matrix_transform = matrix_transform @ translation
+    
+    # Aplicando escala
+    scaling = np.array([
+        [s_x, 0, 0, 0],
+        [0, s_y, 0, 0],
+        [0, 0, s_z, 0],
+        [0, 0, 0, 1]
+    ])
+    matrix_transform = matrix_transform @ scaling
     
     return matrix_transform
+
 
 def view():
     global cameraPos, cameraFront, cameraUp
@@ -690,9 +631,9 @@ glfw.set_cursor_pos(window, lastX, lastY)
 # ------------------------------------------------------------
 
 
-obj = Objeto()
-obj.carrega_obj("caixa.obj")
-obj.carrega_textura("caixa_madeira.jpg")
+obj_caixa = Objeto()
+obj_caixa.carrega_obj("caixa\\caixa.obj")
+obj_caixa.carrega_textura("caixa\\caixa.jpg")
 
 
 glEnable(GL_DEPTH_TEST) ### importante para 3D
@@ -718,7 +659,7 @@ while not glfw.window_should_close(window):
 
     if cull == True:
         glEnable(GL_CULL_FACE) 
-        #glCullFace(GL_FRONT)
+        # glCullFace(GL_FRONT)
         glCullFace(GL_BACK)
     else:
         glDisable(GL_CULL_FACE) 
@@ -728,7 +669,15 @@ while not glfw.window_should_close(window):
 
     # desenha_baleia()
 
-    obj.desenha(program, model(0, 0, 0, 0, 0, 0, 0, 1, 1, 1))
+    obj_caixa.desenha(program, model(0, 0, 0, 
+                                     -1.5, 0, 0, 
+                                     1, 1, 1))
+    
+    obj_caixa.desenha(program, model(0, 0, 0, 
+                                     1.5, 0, 0, 
+                                     1, 1, 1))
+    # obj_caixa.desenha(program, )
+    
 
     if especular: 
         ang += 0.01

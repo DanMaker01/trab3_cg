@@ -14,6 +14,7 @@ class Objeto:
         self.vertex_buffer = None
         self.texture_buffer = None
         self.normal_buffer = None
+        self.indice_inicial = 0
 
     def carrega_textura(self, endereco_textura):
         # Carregar textura e enviar para a GPU
@@ -104,7 +105,7 @@ class Objeto:
                 final_normals.extend([face_normals[0], face_normals[1], face_normals[2],
                                     face_normals[0], face_normals[2], face_normals[3]])
 
-        print(f"Total de vértices processados: {len(final_vertices) // 3}")
+        print(f"Total de vertices processados: {len(final_vertices)}")
 
         # Enviar dados para buffers da GPU
         self.vertex_buffer = glGenBuffers(1)
@@ -130,7 +131,7 @@ class Objeto:
         glBufferData(GL_ARRAY_BUFFER, buffer_data.nbytes, buffer_data, GL_STATIC_DRAW)
         return buffer
 
-    def desenha(self, program, model_matrix):
+    def desenha(self, program, model_matrix = glm.mat4(1.0)):
         # Atualizar matriz de transformação
         loc_model = glGetUniformLocation(program, "model")
         glUniformMatrix4fv(loc_model, 1, GL_FALSE, np.array(model_matrix).T)
@@ -146,7 +147,7 @@ class Objeto:
 
         # Desenhar o objeto
         # print("qtd faces: "+str(len(self.faces)))
-        glDrawArrays(GL_TRIANGLES, 0, 36)
+        glDrawArrays(GL_TRIANGLES, 0, 3*len(self.faces))
 
     def _bind_attribute(self, program, attribute, buffer, size):
         loc = glGetAttribLocation(program, attribute)
