@@ -9,6 +9,7 @@ import glm
 import math
 from PIL import Image
 from objeto import Objeto
+from luz import Luz
 # -----------------------------------
 
 glfw.init()
@@ -400,14 +401,19 @@ def desenha_luz(t_x, t_y, t_z):
     angle_z = 0.0
 
     # Escala
-    s_x = 1
-    s_y = 1
-    s_z = 1
+    s_x = 0.1
+    s_y = 0.1
+    s_z = 0.1
 
     # Cria a matriz model usando a nova função
     # mat_model = model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z)
     mat_model = np.array(glm.mat4(1.0)).T
 
+    mat_model = glm.scale(mat_model, glm.vec3(s_x, s_y, s_z))
+    mat_model = glm.translate(mat_model, glm.vec3(t_x, t_y, t_z))
+    
+    mat_model = np.array(mat_model).T
+    
     # Envia a matriz model para a GPU
     loc_model = glGetUniformLocation(program, "model")
     glUniformMatrix4fv(loc_model, 1, GL_FALSE, mat_model)   
@@ -605,8 +611,8 @@ def model(angle_x, angle_y, angle_z, t_x, t_y, t_z, s_x, s_y, s_z):
         [0, 0, 1, t_z],
         [0, 0, 0, 1]
     ])
-    matrix_transform = matrix_transform @ translation
     matrix_transform = matrix_transform @ scaling
+    matrix_transform = matrix_transform @ translation
     
     return matrix_transform
 
@@ -671,11 +677,11 @@ while not glfw.window_should_close(window):
     # desenha_baleia()
 
     obj_caixa.desenha(program, model(0, 0, 0, 
-                                     -1.5, 0, 0, 
+                                     -2, 0, 0, 
                                      1, 1, 1))
     
     obj_caixa.desenha(program, model(0, 0, 0, 
-                                     1.5, 0, 0, 
+                                     2, 0, 0, 
                                      1, 1, 1))
     # obj_caixa.desenha(program, )
     
